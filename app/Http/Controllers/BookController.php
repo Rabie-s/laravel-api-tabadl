@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use Illuminate\Http\Request;
+use App\Http\Resources\BookResource;
 
 class BookController extends Controller
 {
@@ -12,7 +13,8 @@ class BookController extends Controller
      */
     public function index()
     {
-        return Book::all();
+        $books = Book::paginate(3);
+        return BookResource::collection($books);
     }
 
     /**
