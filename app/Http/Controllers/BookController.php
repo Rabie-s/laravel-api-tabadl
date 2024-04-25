@@ -44,7 +44,8 @@ class BookController extends Controller
      */
     public function show(string $id)
     {
-        return Book::findOrFail($id);
+        $book = Book::with('user')->where('id',$id)->get();
+        return response()->json($book) ;
     }
 
     /**
