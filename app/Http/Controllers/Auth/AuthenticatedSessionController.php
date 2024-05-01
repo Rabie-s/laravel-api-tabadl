@@ -16,18 +16,27 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): JsonResponse
     {
-        $request->authenticate();
 
-        $user = $request->user();
-
-        $user->tokens()->delete();
-
-        $token = $user->createToken('apiToken');
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token->plainTextToken,
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->authenticate();
+
+            $user = $request->user();
+
+            $user->tokens()->delete();
+
+            $token = $user->createToken('apiToken');
+
+            return response()->json([
+                'user' => $user,
+                'token' => $token->plainTextToken,
+            ], 200);
+        }
+        return response()->json(["The provided credentials do not match our records."], 401);
     }
 
     /**
@@ -36,13 +45,8 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request): JsonResponse
     {
         $request->user()->tokens()->delete();
-        
-    /*     $request->session()->invalidate();
-
-        $request->session()->regenerateToken(); */
-
-        return response()->json([null,200]);
-        
-
+        $request->session()->invalidate(); 
+        Auth::guard("web")->logout();
+        return response()->json([null, 200]);
     }
 }
