@@ -13,7 +13,7 @@ class BookController extends Controller
      */
     public function index()
     {
-        $books = Book::paginate(3);
+        $books = Book::paginate(10);
         return BookResource::collection($books);
     }
 
