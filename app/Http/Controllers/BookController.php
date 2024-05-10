@@ -11,9 +11,31 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::paginate(10);
+        // Get the search query and status from the request
+        $status = $request->query('status');
+        $search = $request->query('search');
+
+        // Start building the query with pagination
+        $query = Book::query();
+
+        // If status is provided, filter by status
+        if ($status !== null) {
+            $query->where('status', $status);
+        }
+
+        // If search query is provided, filter by title or other relevant fields
+        if ($search !== null) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Paginate the results
+        $books = $query->paginate(10);
+
+        // Return the paginated list of books as a collection of BookResource
         return BookResource::collection($books);
     }
 
@@ -44,8 +66,8 @@ class BookController extends Controller
      */
     public function show(string $id)
     {
-        $book = Book::with('user')->where('id',$id)->get();
-        return response()->json($book) ;
+        $book = Book::with('user')->where('id', $id)->get();
+        return response()->json($book);
     }
 
     /**
