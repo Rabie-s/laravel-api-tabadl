@@ -13,7 +13,10 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
 
+    Route::resource('books', BookController::class)->only(['index','show']);//can access without authentication
+
     Route::middleware(['auth:sanctum'])->group(function () {
-        Route::resource('books', BookController::class);
+        Route::resource('books', BookController::class)->except(['index','show']);
     });
+    
 });
