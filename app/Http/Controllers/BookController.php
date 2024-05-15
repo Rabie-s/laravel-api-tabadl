@@ -33,7 +33,7 @@ class BookController extends Controller
         }
 
         // Paginate the results
-        $books = $query->paginate(10);
+        $books = $query->latest()->paginate(10);
 
         // Return the paginated list of books as a collection of BookResource
         return BookResource::collection($books);
